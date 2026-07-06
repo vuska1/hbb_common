@@ -117,8 +117,9 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RENDEZVOUS_SRV_TUHH: &str = "****0.rz.tuhh.de";
+pub const RENDEZVOUS_SERVERS: &[&str] = &[RENDEZVOUS_SRV_TUHH];
+pub const RS_PUB_KEY: &str = "";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
@@ -491,7 +492,11 @@ fn patch(path: PathBuf) -> PathBuf {
 
 impl Config2 {
     fn load() -> Config2 {
-        let mut config = Config::load_::<Config2>("2");
+        let mut config = Config::load_::<Config2>("3");
+        config.rendezvous_server = String::from("****0.rz.tuhh.de");
+        *config.options.entry(String::from("key")).or_insert(String::from(RS_PUB_KEY)) = String::from(RS_PUB_KEY);
+        *config.options.entry(String::from("custom-rendezvous-server")).or_insert(String::from("****0.rz.tuhh.de")) = String::from("****0.rz.tuhh.de");
+        *config.options.entry(String::from("relay-server")).or_insert(String::from("****0.rz.tuhh.de")) = String::from("****0.rz.tuhh.de");
         let mut store = false;
         if let Some(mut socks) = config.socks {
             let (password, _, store2) =
@@ -511,12 +516,12 @@ impl Config2 {
     }
 
     pub fn file() -> PathBuf {
-        Config::file_("2")
+        Config::file_("3")
     }
 
     fn store(&self) {
         let mut config = self.clone();
-        let stored = Config::load_::<Config2>("2");
+        let stored = Config::load_::<Config2>("3");
         if let Some(mut socks) = config.socks {
             let stored_password = stored
                 .socks
@@ -529,7 +534,7 @@ impl Config2 {
         }
         config.unlock_pin =
             keep_encrypted_storage_if_plaintext_unchanged(&config.unlock_pin, &stored.unlock_pin);
-        Config::store_(&config, "2");
+        Config::store_(&config, "3");
     }
 
     pub fn get() -> Config2 {
@@ -911,6 +916,8 @@ impl Config {
     }
 
     pub fn get_rendezvous_server() -> String {
+        return format!("{RENDEZVOUS_SRV_TUHH}:{RENDEZVOUS_PORT}");
+        /*
         let mut rendezvous_server = EXE_RENDEZVOUS_SERVER.read().unwrap().clone();
         if rendezvous_server.is_empty() {
             rendezvous_server = Self::get_option("custom-rendezvous-server");
@@ -931,6 +938,7 @@ impl Config {
             rendezvous_server = format!("{rendezvous_server}:{RENDEZVOUS_PORT}");
         }
         rendezvous_server
+        */
     }
 
     pub fn get_rendezvous_servers() -> Vec<String> {
