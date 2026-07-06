@@ -117,9 +117,10 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SRV_TUHH: &str = "****0.rz.tuhh.de";
+// claude: Werte werden zur Build-Zeit aus GitHub-Secrets injiziert (TUHH_SERVER, TUHH_RS_PUB_KEY)
+pub const RENDEZVOUS_SRV_TUHH: &str = env!("TUHH_SERVER");
 pub const RENDEZVOUS_SERVERS: &[&str] = &[RENDEZVOUS_SRV_TUHH];
-pub const RS_PUB_KEY: &str = "";
+pub const RS_PUB_KEY: &str = env!("TUHH_RS_PUB_KEY");
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
@@ -493,10 +494,10 @@ fn patch(path: PathBuf) -> PathBuf {
 impl Config2 {
     fn load() -> Config2 {
         let mut config = Config::load_::<Config2>("3");
-        config.rendezvous_server = String::from("****0.rz.tuhh.de");
+        config.rendezvous_server = String::from(RENDEZVOUS_SRV_TUHH);
         *config.options.entry(String::from("key")).or_insert(String::from(RS_PUB_KEY)) = String::from(RS_PUB_KEY);
-        *config.options.entry(String::from("custom-rendezvous-server")).or_insert(String::from("****0.rz.tuhh.de")) = String::from("****0.rz.tuhh.de");
-        *config.options.entry(String::from("relay-server")).or_insert(String::from("****0.rz.tuhh.de")) = String::from("****0.rz.tuhh.de");
+        *config.options.entry(String::from("custom-rendezvous-server")).or_insert(String::from(RENDEZVOUS_SRV_TUHH)) = String::from(RENDEZVOUS_SRV_TUHH);
+        *config.options.entry(String::from("relay-server")).or_insert(String::from(RENDEZVOUS_SRV_TUHH)) = String::from(RENDEZVOUS_SRV_TUHH);
         let mut store = false;
         if let Some(mut socks) = config.socks {
             let (password, _, store2) =
